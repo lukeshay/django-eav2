@@ -17,10 +17,10 @@ from eav.logic.object_pk import get_pk_format
 
 if TYPE_CHECKING:
     from .attribute import AbstractAttribute
-    from .enum_value import AbstractEnumValue
+    from .enum_value import EnumValue
 
 
-class AbstractValue(models.Model):
+class Value(models.Model):
     """
     Putting the **V** in *EAV*.
 
@@ -47,6 +47,7 @@ class AbstractValue(models.Model):
     id = get_pk_format()
 
     # Direct foreign keys
+    # Note: This references the swappable Attribute model
     attribute: ForeignKey["AbstractAttribute"] = ForeignKey(
         "eav.Attribute",
         db_index=True,
@@ -137,7 +138,7 @@ class AbstractValue(models.Model):
         verbose_name=_("Value JSON"),
     )
 
-    value_enum: ForeignKey[Optional["AbstractEnumValue"]] = ForeignKey(
+    value_enum: ForeignKey[Optional[EnumValue]] = ForeignKey(
         "eav.EnumValue",
         blank=True,
         null=True,
@@ -170,7 +171,6 @@ class AbstractValue(models.Model):
     objects = ValueManager()
 
     class Meta:
-        abstract = True
         verbose_name = _("Value")
         verbose_name_plural = _("Values")
 
@@ -231,16 +231,3 @@ class AbstractValue(models.Model):
         setattr(self, f"value_{self.attribute.datatype}", new_value)
 
     value = property(_get_value, _set_value)
-
-
-class Value(AbstractValue):
-    """
-    Default concrete implementation of AbstractValue.
-    
-    This model can be swapped with a custom model by setting EAV_VALUE_MODEL
-    in your Django settings.
-    """
-    
-    class Meta(AbstractValue.Meta):
-        abstract = False
-        swappable = "EAV_VALUE_MODEL"

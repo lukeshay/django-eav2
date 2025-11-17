@@ -11,10 +11,10 @@ from eav.logic.object_pk import get_pk_format
 from eav.settings import CHARFIELD_LENGTH
 
 if TYPE_CHECKING:
-    from .enum_value import AbstractEnumValue
+    from .enum_value import EnumValue
 
 
-class AbstractEnumGroup(models.Model):
+class EnumGroup(models.Model):
     """
     *EnumGroup* objects have two fields - a *name* ``CharField`` and *values*,
     a ``ManyToManyField`` to :class:`EnumValue`. :class:`Attribute` classes
@@ -30,7 +30,7 @@ class AbstractEnumGroup(models.Model):
         max_length=CHARFIELD_LENGTH,
         verbose_name=_("Name"),
     )
-    values: ManyToManyField["AbstractEnumValue", Any] = ManyToManyField(
+    values: ManyToManyField[EnumValue, Any] = ManyToManyField(
         "eav.EnumValue",
         verbose_name=_("Enum group"),
     )
@@ -38,7 +38,6 @@ class AbstractEnumGroup(models.Model):
     objects = EnumGroupManager()
 
     class Meta:
-        abstract = True
         verbose_name = _("EnumGroup")
         verbose_name_plural = _("EnumGroups")
 
@@ -62,16 +61,3 @@ class AbstractEnumGroup(models.Model):
             tuple: A tuple containing the name of the EnumGroup instance.
         """
         return (self.name,)
-
-
-class EnumGroup(AbstractEnumGroup):
-    """
-    Default concrete implementation of AbstractEnumGroup.
-    
-    This model can be swapped with a custom model by setting EAV_ENUM_GROUP_MODEL
-    in your Django settings.
-    """
-    
-    class Meta(AbstractEnumGroup.Meta):
-        abstract = False
-        swappable = "EAV_ENUM_GROUP_MODEL"

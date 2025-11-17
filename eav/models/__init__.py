@@ -1,5 +1,5 @@
 """
-This module defines the four concrete, non-abstract models:
+This module defines the four concrete models:
     * :class:`Value`
     * :class:`Attribute`
     * :class:`EnumValue`
@@ -8,30 +8,19 @@ This module defines the four concrete, non-abstract models:
 Along with the :class:`Entity` helper class and :class:`EAVModelMeta`
 optional metaclass for each eav model class.
 
-Abstract base models are also available for extending:
-    * :class:`AbstractAttribute`
-    * :class:`AbstractValue`
-    * :class:`AbstractEnumValue`
-    * :class:`AbstractEnumGroup`
+The :class:`Attribute` model is swappable and can be extended via
+:class:`AbstractAttribute`. Other models are regular Django models.
 """
 
 from .attribute import AbstractAttribute, Attribute
 from .entity import EAVModelMeta, Entity
-from .enum_group import AbstractEnumGroup, EnumGroup
-from .enum_value import AbstractEnumValue, EnumValue
-from .utils import (
-    get_attribute_model,
-    get_enum_group_model,
-    get_enum_value_model,
-    get_value_model,
-)
-from .value import AbstractValue, Value
+from .enum_group import EnumGroup
+from .enum_value import EnumValue
+from .utils import get_attribute_model
+from .value import Value
 
 __all__ = [
     "AbstractAttribute",
-    "AbstractEnumGroup",
-    "AbstractEnumValue",
-    "AbstractValue",
     "Attribute",
     "EAVModelMeta",
     "Entity",
@@ -39,7 +28,4 @@ __all__ = [
     "EnumValue",
     "Value",
     "get_attribute_model",
-    "get_enum_group_model",
-    "get_enum_value_model",
-    "get_value_model",
 ]

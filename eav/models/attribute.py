@@ -273,9 +273,8 @@ class AbstractAttribute(models.Model):
             validator(value)
 
         if self.datatype == self.TYPE_ENUM:
-            from .enum_value import get_enum_value_model
+            from .enum_value import EnumValue
             
-            EnumValue = get_enum_value_model()
             if isinstance(value, EnumValue):
                 value = value.value
             if not self.enum_group.values.filter(value=value).exists():
@@ -353,9 +352,8 @@ class AbstractAttribute(models.Model):
             f"{get_entity_pk_type(entity)}": entity.pk,
         }
 
-        from .value import get_value_model
+        from .value import Value
         
-        Value = get_value_model()
         try:
             value_obj = self.value_set.get(**entity_filter)
         except Value.DoesNotExist:

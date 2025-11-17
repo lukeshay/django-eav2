@@ -9,12 +9,7 @@ from django.contrib.admin.options import InlineModelAdmin, ModelAdmin
 from django.forms.models import BaseInlineFormSet
 from django.utils.safestring import mark_safe
 
-from eav.models import (
-    get_attribute_model,
-    get_enum_group_model,
-    get_enum_value_model,
-    get_value_model,
-)
+from eav.models import EnumGroup, EnumValue, Value, get_attribute_model
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -167,12 +162,8 @@ class AttributeAdmin(ModelAdmin):
     prepopulated_fields: ClassVar[dict[str, Sequence[str]]] = {"slug": ("name",)}
 
 
-# Register models using swappable model functions
-# These functions use require_ready=False so they can be called at import time
+# Register models - Attribute is swappable, others are regular models
 Attribute = get_attribute_model()
-EnumValue = get_enum_value_model()
-EnumGroup = get_enum_group_model()
-Value = get_value_model()
 
 admin.site.register(Attribute, AttributeAdmin)
 admin.site.register(EnumValue)
