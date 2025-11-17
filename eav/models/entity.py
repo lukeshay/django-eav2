@@ -9,10 +9,6 @@ from eav import register
 from eav.exceptions import IllegalAssignmentException
 from eav.logic.entity_pk import get_entity_pk_type
 
-from .attribute import Attribute
-from .enum_value import EnumValue
-from .value import Value
-
 
 class Entity:
     """Helper class that will be attached to entities registered with eav."""
@@ -59,6 +55,11 @@ class Entity:
         None.
         """
         if not name.startswith("_"):
+            from eav.conf import get_attribute_model, get_value_model
+
+            Attribute = get_attribute_model()
+            Value = get_value_model()
+
             try:
                 attribute = self.get_attribute_by_slug(name)
             except Attribute.DoesNotExist as err:
@@ -101,6 +102,11 @@ class Entity:
 
     def save(self):
         """Saves all the EAV values that have been set on this entity."""
+        from eav.conf import get_attribute_model, get_enum_value_model
+
+        Attribute = get_attribute_model()
+        EnumValue = get_enum_value_model()
+
         for attribute in self.get_all_attributes():
             if self._hasattr(attribute.slug):
                 attribute_value = self._getattr(attribute.slug)
@@ -166,6 +172,10 @@ class Entity:
 
     def get_values(self):
         """Get all set :class:`Value` objects for self.instance."""
+        from eav.conf import get_value_model
+
+        Value = get_value_model()
+
         entity_filter = {
             "entity_ct": self.ct,
             f"{get_entity_pk_type(self.instance)}": self.instance.pk,

@@ -22,6 +22,33 @@ Data in EAV is stored as a 3-tuple (typically corresponding to three distinct ta
 Entities in **django-eav2** are your typical Django model instances. Attributes (name and type) are stored in their own table, which makes it easy to manipulate the list of available attributes in the system. Values are an intermediate table between attributes and entities, each instance holding a single value.
 This implementation also makes it easy to edit attributes in Django Admin and form instances.
 
+## 🎉 New: Swappable Models
+
+Django EAV 2 now supports **swappable models**, similar to Django's `AUTH_USER_MODEL`. This allows you to customize EAV models by adding your own fields and methods without modifying the core package.
+
+### Quick Example
+
+```python
+# myapp/models.py
+from eav.models import AbstractAttribute
+
+class CustomAttribute(AbstractAttribute):
+    # Add your custom field
+    show_in_frontend = models.BooleanField(default=True)
+    
+    class Meta(AbstractAttribute.Meta):
+        swappable = 'EAV_ATTRIBUTE_MODEL'
+
+# settings.py
+EAV_ATTRIBUTE_MODEL = 'myapp.CustomAttribute'
+
+# Usage
+from eav import get_attribute_model
+Attribute = get_attribute_model()
+```
+
+See [Swappable Models Documentation](SWAPPABLE_MODELS_EXAMPLE.md) for complete examples and guide.
+
 You will find detailed description of the EAV here:
 
 - [Wikipedia - Entity–attribute–value model](https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model)
