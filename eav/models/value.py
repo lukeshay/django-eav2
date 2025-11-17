@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Optional
 
+from django.conf import settings
 from django.contrib.contenttypes import fields as generic
 from django.contrib.contenttypes.models import ContentType
 from django.core.serializers.json import DjangoJSONEncoder
@@ -14,6 +15,8 @@ from django.utils.translation import gettext_lazy as _
 from eav.fields import CSVField
 from eav.logic.managers import ValueManager
 from eav.logic.object_pk import get_pk_format
+
+from eav.settings import EAV_ATTRIBUTE_MODEL as DEFAULT_ATTRIBUTE_MODEL
 
 if TYPE_CHECKING:
     from .attribute import AbstractAttribute
@@ -48,8 +51,8 @@ class Value(models.Model):
 
     # Direct foreign keys
     # Note: This references the swappable Attribute model
-    attribute: ForeignKey["AbstractAttribute"] = ForeignKey(
-        "eav.Attribute",
+    attribute: ForeignKey[AbstractAttribute] = ForeignKey(
+        getattr(settings, "EAV_ATTRIBUTE_MODEL", DEFAULT_ATTRIBUTE_MODEL),
         db_index=True,
         on_delete=models.PROTECT,
         verbose_name=_("Attribute"),

@@ -13,10 +13,10 @@ from eav.settings import EAV_ATTRIBUTE_MODEL as DEFAULT_ATTRIBUTE_MODEL
 def get_attribute_model():
     """
     Return the Attribute model that is active in this project.
-    
+
     Returns:
         The Attribute model class.
-    
+
     Raises:
         ImproperlyConfigured: If the model cannot be found or is not configured correctly.
     """
