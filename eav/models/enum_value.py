@@ -8,7 +8,7 @@ from eav.logic.object_pk import get_pk_format
 from eav.logic.slug import SLUGFIELD_MAX_LENGTH
 
 
-class EnumValue(models.Model):
+class AbstractEnumValue(models.Model):
     """
     *EnumValue* objects are the value 'choices' to multiple choice *TYPE_ENUM*
     :class:`Attribute` objects. They have only one field, *value*, a
@@ -47,6 +47,7 @@ class EnumValue(models.Model):
     objects = EnumValueManager()
 
     class Meta:
+        abstract = True
         verbose_name = _("EnumValue")
         verbose_name_plural = _("EnumValues")
 
@@ -72,3 +73,16 @@ class EnumValue(models.Model):
             tuple: A tuple containing the value of the EnumValue instance.
         """
         return (self.value,)
+
+
+class EnumValue(AbstractEnumValue):
+    """
+    Default concrete implementation of AbstractEnumValue.
+    
+    This model can be swapped with a custom model by setting EAV_ENUM_VALUE_MODEL
+    in your Django settings.
+    """
+    
+    class Meta(AbstractEnumValue.Meta):
+        abstract = False
+        swappable = "EAV_ENUM_VALUE_MODEL"

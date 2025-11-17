@@ -5,7 +5,7 @@ from django.db.models.signals import post_init, post_save, pre_save
 
 from eav.logic.entity_pk import get_entity_pk_type
 from eav.managers import EntityManager
-from eav.models import Attribute, Entity, Value
+from eav.models import Entity, get_attribute_model, get_value_model
 
 
 class EavConfig:
@@ -40,6 +40,7 @@ class EavConfig:
         By default, all :class:`~eav.models.Attribute` object apply to an
         entity, unless you provide a custom EavConfig class overriding this.
         """
+        Attribute = get_attribute_model()
         return Attribute.objects.all()
 
 
@@ -177,6 +178,7 @@ class Registry:
             self.config_cls.generic_relation_related_name or self.model_cls.__name__
         )
 
+        Value = get_value_model()
         gr_name = self.config_cls.generic_relation_attr.lower()
         generic_relation = generic.GenericRelation(
             Value,

@@ -30,14 +30,13 @@ from eav.validators import (
     validate_text,
 )
 
-from .enum_value import EnumValue
-from .value import Value
-
 if TYPE_CHECKING:
     from .enum_group import EnumGroup
+    from .enum_value import EnumValue
+    from .value import Value
 
 
-class Attribute(models.Model):
+class AbstractAttribute(models.Model):
     """
     Putting the **A** in *EAV*. This holds the attributes, or concepts.
     Examples of possible *Attributes*: color, height, weight, number of
@@ -165,7 +164,7 @@ class Attribute(models.Model):
     :meth:`~eav.registry.EavConfig.get_attributes` method of that entity's config.
     """
 
-    enum_group: ForeignKey[Optional[EnumGroup]] = ForeignKey(
+    enum_group: ForeignKey[Optional["EnumGroup"]] = ForeignKey(
         "eav.EnumGroup",
         on_delete=models.PROTECT,
         blank=True,
@@ -202,6 +201,7 @@ class Attribute(models.Model):
     objects = AttributeManager()
 
     class Meta:
+        abstract = True
         ordering = ("name",)
         verbose_name = _("Attribute")
         verbose_name_plural = _("Attributes")
@@ -273,6 +273,9 @@ class Attribute(models.Model):
             validator(value)
 
         if self.datatype == self.TYPE_ENUM:
+            from .enum_value import get_enum_value_model
+            
+            EnumValue = get_enum_value_model()
             if isinstance(value, EnumValue):
                 value = value.value
             if not self.enum_group.values.filter(value=value).exists():
@@ -325,7 +328,7 @@ class Attribute(models.Model):
         """
         return (
             self.enum_group.values.all()
-            if self.datatype == Attribute.TYPE_ENUM
+            if self.datatype == self.TYPE_ENUM
             else None
         )
 
@@ -350,6 +353,9 @@ class Attribute(models.Model):
             f"{get_entity_pk_type(entity)}": entity.pk,
         }
 
+        from .value import get_value_model
+        
+        Value = get_value_model()
         try:
             value_obj = self.value_set.get(**entity_filter)
         except Value.DoesNotExist:
@@ -365,3 +371,16 @@ class Attribute(models.Model):
         if value != value_obj.value:
             value_obj.value = value
             value_obj.save()
+
+
+class Attribute(AbstractAttribute):
+    """
+    Default concrete implementation of AbstractAttribute.
+    
+    This model can be swapped with a custom model by setting EAV_ATTRIBUTE_MODEL
+    in your Django settings.
+    """
+    
+    class Meta(AbstractAttribute.Meta):
+        abstract = False
+        swappable = "EAV_ATTRIBUTE_MODEL"
