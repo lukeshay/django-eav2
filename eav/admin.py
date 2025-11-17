@@ -9,7 +9,7 @@ from django.contrib.admin.options import InlineModelAdmin, ModelAdmin
 from django.forms.models import BaseInlineFormSet
 from django.utils.safestring import mark_safe
 
-from eav.models import Attribute, EnumGroup, EnumValue, Value
+from eav.models import EnumGroup, EnumValue, Value, get_attribute_model
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -161,6 +161,9 @@ class AttributeAdmin(ModelAdmin):
     list_display = ("name", "slug", "datatype", "description")
     prepopulated_fields: ClassVar[dict[str, Sequence[str]]] = {"slug": ("name",)}
 
+
+# Register models - Attribute is swappable, others are regular models
+Attribute = get_attribute_model()
 
 admin.site.register(Attribute, AttributeAdmin)
 admin.site.register(EnumValue)

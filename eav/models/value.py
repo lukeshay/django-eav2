@@ -16,7 +16,7 @@ from eav.logic.managers import ValueManager
 from eav.logic.object_pk import get_pk_format
 
 if TYPE_CHECKING:
-    from .attribute import Attribute
+    from .attribute import AbstractAttribute
     from .enum_value import EnumValue
 
 
@@ -47,7 +47,8 @@ class Value(models.Model):
     id = get_pk_format()
 
     # Direct foreign keys
-    attribute: ForeignKey[Attribute] = ForeignKey(
+    # Note: This references the swappable Attribute model
+    attribute: ForeignKey["AbstractAttribute"] = ForeignKey(
         "eav.Attribute",
         db_index=True,
         on_delete=models.PROTECT,

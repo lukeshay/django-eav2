@@ -27,7 +27,7 @@ from django.db.models import Case, IntegerField, Q, When
 from django.db.models.query import QuerySet
 from django.db.utils import NotSupportedError
 
-from eav.models import Attribute, EnumValue, Value
+from eav.models import EnumValue, Value, get_attribute_model
 
 
 def is_eav_and_leaf(expr, gr_name):
@@ -233,6 +233,7 @@ def expand_eav_filter(model_cls, key, value):
     config_cls = getattr(model_cls, "_eav_config_cls", None)
 
     if len(fields) > 1 and config_cls and fields[0] == config_cls.eav_attr:
+        Attribute = get_attribute_model()
         slug = fields[1]
         gr_name = config_cls.generic_relation_attr
         datatype = Attribute.objects.get(slug=slug).datatype
@@ -297,6 +298,7 @@ class EavQuerySet(QuerySet):
         for term in [t.split("__") for t in fields]:
             # Continue only for EAV attributes.
             if len(term) == 2 and term[0] == config_cls.eav_attr:  # noqa: PLR2004
+                Attribute = get_attribute_model()
                 # Retrieve Attribute over which the ordering is performed.
                 try:
                     attr = Attribute.objects.get(slug=term[1])

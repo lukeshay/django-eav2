@@ -9,8 +9,8 @@ from eav import register
 from eav.exceptions import IllegalAssignmentException
 from eav.logic.entity_pk import get_entity_pk_type
 
-from .attribute import Attribute
 from .enum_value import EnumValue
+from .utils import get_attribute_model
 from .value import Value
 
 
@@ -59,6 +59,7 @@ class Entity:
         None.
         """
         if not name.startswith("_"):
+            Attribute = get_attribute_model()
             try:
                 attribute = self.get_attribute_by_slug(name)
             except Attribute.DoesNotExist as err:
@@ -101,6 +102,7 @@ class Entity:
 
     def save(self):
         """Saves all the EAV values that have been set on this entity."""
+        Attribute = get_attribute_model()
         for attribute in self.get_all_attributes():
             if self._hasattr(attribute.slug):
                 attribute_value = self._getattr(attribute.slug)
