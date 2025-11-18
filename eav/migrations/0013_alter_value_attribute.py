@@ -9,13 +9,13 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('eav', '0012_add_value_uniqueness_checks'),
-        migrations.swappable_dependency(settings.EAV_ATTRIBUTE_MODEL),
+        migrations.swappable_dependency(getattr(settings, 'EAV_ATTRIBUTE_MODEL', 'eav.Attribute')),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='value',
             name='attribute',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.EAV_ATTRIBUTE_MODEL, verbose_name='Attribute'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=getattr(settings, 'EAV_ATTRIBUTE_MODEL', 'eav.Attribute'), verbose_name='Attribute'),
         ),
     ]
