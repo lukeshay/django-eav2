@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from .enum_value import EnumValue
 
 
-class Value(models.Model):
+class AbstractValue(models.Model):
     """
     Putting the **V** in *EAV*.
 
@@ -174,6 +174,7 @@ class Value(models.Model):
     objects = ValueManager()
 
     class Meta:
+        abstract = True
         verbose_name = _("Value")
         verbose_name_plural = _("Values")
 
@@ -234,3 +235,16 @@ class Value(models.Model):
         setattr(self, f"value_{self.attribute.datatype}", new_value)
 
     value = property(_get_value, _set_value)
+
+
+class Value(AbstractValue):
+    """
+    Default concrete implementation of AbstractValue.
+
+    This model can be swapped with a custom model by setting EAV_VALUE_MODEL
+    in your Django settings.
+    """
+
+    class Meta(AbstractValue.Meta):
+        abstract = False
+        swappable = "EAV_VALUE_MODEL"

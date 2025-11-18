@@ -10,8 +10,7 @@ from eav.exceptions import IllegalAssignmentException
 from eav.logic.entity_pk import get_entity_pk_type
 
 from .enum_value import EnumValue
-from .utils import get_attribute_model
-from .value import Value
+from .utils import get_attribute_model, get_value_model
 
 
 class Entity:
@@ -60,6 +59,7 @@ class Entity:
         """
         if not name.startswith("_"):
             Attribute = get_attribute_model()
+            Value = get_value_model()
             try:
                 attribute = self.get_attribute_by_slug(name)
             except Attribute.DoesNotExist as err:
@@ -173,6 +173,7 @@ class Entity:
             f"{get_entity_pk_type(self.instance)}": self.instance.pk,
         }
 
+        Value = get_value_model()
         return Value.objects.filter(**entity_filter).select_related()
 
     def get_all_attribute_slugs(self):

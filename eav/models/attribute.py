@@ -17,6 +17,7 @@ from eav.logic.entity_pk import get_entity_pk_type
 from eav.logic.managers import AttributeManager
 from eav.logic.object_pk import get_pk_format
 from eav.logic.slug import SLUGFIELD_MAX_LENGTH, generate_slug
+from eav.models.utils import get_value_model
 from eav.settings import CHARFIELD_LENGTH
 from eav.validators import (
     validate_bool,
@@ -274,7 +275,7 @@ class AbstractAttribute(models.Model):
 
         if self.datatype == self.TYPE_ENUM:
             from .enum_value import EnumValue
-            
+
             if isinstance(value, EnumValue):
                 value = value.value
             if not self.enum_group.values.filter(value=value).exists():
@@ -352,8 +353,8 @@ class AbstractAttribute(models.Model):
             f"{get_entity_pk_type(entity)}": entity.pk,
         }
 
-        from .value import Value
-        
+        Value = get_value_model()
+
         try:
             value_obj = self.value_set.get(**entity_filter)
         except Value.DoesNotExist:
@@ -374,11 +375,11 @@ class AbstractAttribute(models.Model):
 class Attribute(AbstractAttribute):
     """
     Default concrete implementation of AbstractAttribute.
-    
+
     This model can be swapped with a custom model by setting EAV_ATTRIBUTE_MODEL
     in your Django settings.
     """
-    
+
     class Meta(AbstractAttribute.Meta):
         abstract = False
         swappable = "EAV_ATTRIBUTE_MODEL"

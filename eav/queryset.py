@@ -27,7 +27,7 @@ from django.db.models import Case, IntegerField, Q, When
 from django.db.models.query import QuerySet
 from django.db.utils import NotSupportedError
 
-from eav.models import EnumValue, Value, get_attribute_model
+from eav.models import EnumValue, get_attribute_model, get_value_model
 
 
 def is_eav_and_leaf(expr, gr_name):
@@ -248,6 +248,7 @@ def expand_eav_filter(model_cls, key, value):
             lookup = f"__{fields[2]}" if len(fields) > 2 else ""  # noqa: PLR2004
             value_key = f"value_{datatype}{lookup}"
         kwargs = {value_key: value, "attribute__slug": slug}
+        Value = get_value_model()
         value = Value.objects.filter(**kwargs)
 
         return f"{gr_name}__in", value
@@ -309,6 +310,7 @@ class EavQuerySet(QuerySet):
 
                 field_name = f"value_{attr.datatype}"
 
+                Value = get_value_model()
                 pks_values = (
                     Value.objects.filter(
                         # Retrieve pk-values pairs of the related values
