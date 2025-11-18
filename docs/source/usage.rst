@@ -312,3 +312,37 @@ The Django EAV 2 integration allows you to customize the presentation of EAV
 attributes in the admin interface through the use of a dedicated fieldset. You
 can configure this fieldset by setting ``eav_fieldset_title`` and
 ``eav_fieldset_description`` within your admin class.
+
+Swapping the Value model
+------------------------
+
+When you need to extend the data stored for each attribute value (for example,
+track whether the value should be exposed to another system), create your own
+Value model by subclassing :class:`eav.models.AbstractValue` and update the
+``EAV_VALUE_MODEL`` setting:
+
+.. code-block:: python
+
+    # my_project/eav_extensions/models.py
+    from django.db import models
+    from eav.models import AbstractValue
+
+
+    class CustomValue(AbstractValue):
+        return_to_frontend = models.BooleanField(default=True)
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        "my_project.eav_extensions",  # must be before "eav"
+        "eav",
+    ]
+
+    EAV_VALUE_MODEL = "eav_extensions.CustomValue"
+
+Make sure the application containing your Value subclass appears before ``eav``
+in :data:`django.conf.settings.INSTALLED_APPS` so Django can discover the model
+while loading the eav app. After updating the setting, create and apply a
+migration for the new model. All of django-eav2's internals—including registry
+integration, admin, and queryset helpers—automatically switch to the configured
+model once the setting is in place.

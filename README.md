@@ -141,6 +141,36 @@ If the primary key of eav models are to be modified (UUIDField -> BigAutoField, 
  python manage.py migrate
  ```
 
+### Swapping the Value model
+
+If you need to store additional metadata on each value (for example, a flag that
+controls whether it should be exposed to your front end), subclass
+`eav.models.AbstractValue` and point the `EAV_VALUE_MODEL` setting at your new
+class:
+
+```python
+# my_project/eav_extensions/models.py
+from django.db import models
+from eav.models import AbstractValue
+
+
+class CustomValue(AbstractValue):
+    return_to_frontend = models.BooleanField(default=True)
+```
+
+```python
+# settings.py
+INSTALLED_APPS = [
+    "my_project.eav_extensions",  # must appear before "eav"
+    "eav",
+]
+
+EAV_VALUE_MODEL = "eav_extensions.CustomValue"
+```
+
+After updating the setting, create and apply migrations for your new model. Any
+EAV entity you register will automatically use the configured Value model.
+
 ### Note: Django 2.2 Users
 
 Since `models.JSONField()` isn't supported in Django 2.2, we use [django-jsonfield-backport](https://github.com/laymonage/django-jsonfield-backport) to provide [JSONField](https://docs.djangoproject.com/en/dev/releases/3.1/#jsonfield-for-all-supported-database-backends) functionality.

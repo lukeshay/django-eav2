@@ -9,7 +9,8 @@ from django.contrib.admin.options import InlineModelAdmin, ModelAdmin
 from django.forms.models import BaseInlineFormSet
 from django.utils.safestring import mark_safe
 
-from eav.models import Attribute, EnumGroup, EnumValue, Value
+from eav.conf import get_value_model
+from eav.models import Attribute, EnumGroup, EnumValue
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -165,4 +166,4 @@ class AttributeAdmin(ModelAdmin):
 admin.site.register(Attribute, AttributeAdmin)
 admin.site.register(EnumValue)
 admin.site.register(EnumGroup)
-admin.site.register(Value)
+admin.site.register(get_value_model())

@@ -1,9 +1,13 @@
+from unittest import mock
+
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.test import override_settings
 
-from eav.models import Attribute, Value
+from eav.conf import get_value_model
+from eav.models import AbstractValue, Attribute, Value
 from test_project.models import Doctor, Patient
 
 
@@ -317,3 +321,23 @@ class TestValueDatabaseConstraints:
             ],
         )
         assert len(values) == 1
+
+
+class TestValueModelConfiguration:
+    """Ensure the Value model can be swapped via settings."""
+
+    def test_value_model_meta_is_swappable(self) -> None:
+        """The default Value model must declare itself swappable."""
+        assert Value._meta.swappable == "EAV_VALUE_MODEL"
+
+    @override_settings(EAV_VALUE_MODEL="tests_app.CustomValue")
+    def test_get_value_model_returns_swapped_model(self) -> None:
+        """get_value_model should resolve the configured Value model."""
+
+        class CustomValue(AbstractValue):  # type: ignore[misc]
+            class Meta(AbstractValue.Meta):
+                app_label = "tests_app"
+
+        with mock.patch("eav.conf.apps.get_model", return_value=CustomValue) as mocked:
+            assert get_value_model() is CustomValue
+            mocked.assert_called_once_with("tests_app.CustomValue", require_ready=False)

@@ -13,9 +13,10 @@ from .attribute import Attribute
 from .entity import EAVModelMeta, Entity
 from .enum_group import EnumGroup
 from .enum_value import EnumValue
-from .value import Value
+from .value import AbstractValue, Value
 
 __all__ = [
+    "AbstractValue",
     "Attribute",
     "EAVModelMeta",
     "Entity",

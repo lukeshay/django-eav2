@@ -12,6 +12,7 @@ from django.db.models import ForeignKey
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from eav.conf import get_value_model
 from eav.fields import EavDatatypeField
 from eav.logic.entity_pk import get_entity_pk_type
 from eav.logic.managers import AttributeManager
@@ -31,8 +32,6 @@ from eav.validators import (
 )
 
 from .enum_value import EnumValue
-from .value import Value
-
 if TYPE_CHECKING:
     from .enum_group import EnumGroup
 
@@ -350,13 +349,15 @@ class Attribute(models.Model):
             f"{get_entity_pk_type(entity)}": entity.pk,
         }
 
+        value_model = get_value_model()
+
         try:
-            value_obj = self.value_set.get(**entity_filter)
-        except Value.DoesNotExist:
+            value_obj = value_model.objects.get(**entity_filter)
+        except value_model.DoesNotExist:
             if value is None or value == "":
                 return
 
-            value_obj = Value.objects.create(**entity_filter)
+            value_obj = value_model.objects.create(**entity_filter)
 
         if value is None or value == "":
             value_obj.delete()

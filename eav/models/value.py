@@ -20,28 +20,12 @@ if TYPE_CHECKING:
     from .enum_value import EnumValue
 
 
-class Value(models.Model):
+class AbstractValue(models.Model):
     """
-    Putting the **V** in *EAV*.
+    Abstract base class for all Value implementations.
 
-    This model stores the value for one particular :class:`Attribute` for
-    some entity.
-
-    As with most EAV implementations, most of the columns of this model will
-    be blank, as onle one *value_* field will be used.
-
-    Example::
-
-        import eav
-        from django.contrib.auth.models import User
-
-        eav.register(User)
-
-        u = User.objects.create(username='crazy_dev_user')
-        a = Attribute.objects.create(name='Fav Drink', datatype='text')
-
-        Value.objects.create(entity = u, attribute = a, value_text = 'red bull')
-        # = <Value: crazy_dev_user - Fav Drink: "red bull">
+    Custom Value models should subclass :class:`AbstractValue` and set
+    :data:`~django.conf.settings.EAV_VALUE_MODEL` to point to the new class.
     """
 
     id = get_pk_format()
@@ -170,6 +154,7 @@ class Value(models.Model):
     objects = ValueManager()
 
     class Meta:
+        abstract = True
         verbose_name = _("Value")
         verbose_name_plural = _("Values")
 
@@ -230,3 +215,16 @@ class Value(models.Model):
         setattr(self, f"value_{self.attribute.datatype}", new_value)
 
     value = property(_get_value, _set_value)
+
+
+class Value(AbstractValue):
+    """
+    Default concrete Value implementation used by django-eav2.
+
+    This model remains available for backwards compatibility but can be swapped
+    by pointing :data:`~django.conf.settings.EAV_VALUE_MODEL` to a subclass of
+    :class:`AbstractValue`.
+    """
+
+    class Meta(AbstractValue.Meta):
+        swappable = "EAV_VALUE_MODEL"

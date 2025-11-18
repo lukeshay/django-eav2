@@ -6,12 +6,12 @@ from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _
 
 from eav import register
+from eav.conf import get_value_model
 from eav.exceptions import IllegalAssignmentException
 from eav.logic.entity_pk import get_entity_pk_type
 
 from .attribute import Attribute
 from .enum_value import EnumValue
-from .value import Value
 
 
 class Entity:
@@ -67,9 +67,10 @@ class Entity:
                     % {"obj": self.instance, "attr": name},
                 ) from err
 
+            value_model = get_value_model()
             try:
                 return self.get_value_by_attribute(attribute).value
-            except Value.DoesNotExist:
+            except value_model.DoesNotExist:
                 return None
 
         return getattr(super(), name)
@@ -171,7 +172,8 @@ class Entity:
             f"{get_entity_pk_type(self.instance)}": self.instance.pk,
         }
 
-        return Value.objects.filter(**entity_filter).select_related()
+        value_model = get_value_model()
+        return value_model.objects.filter(**entity_filter).select_related()
 
     def get_all_attribute_slugs(self):
         """Returns a list of slugs for all attributes available to this entity."""

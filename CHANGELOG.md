@@ -2,6 +2,13 @@
 
 We follow [Semantic Versions](https://semver.org/) starting at the `0.14.0` release.
 
+## Unreleased
+
+### What's Changed
+
+- Allow the `Value` model to be swapped via the new `EAV_VALUE_MODEL` setting and
+  `AbstractValue` base class.
+
 ## 1.8.1 (2025-06-02)
 
 ## What's Changed

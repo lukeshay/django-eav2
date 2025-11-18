@@ -3,9 +3,10 @@
 from django.contrib.contenttypes import fields as generic
 from django.db.models.signals import post_init, post_save, pre_save
 
+from eav.conf import get_value_model_name
 from eav.logic.entity_pk import get_entity_pk_type
 from eav.managers import EntityManager
-from eav.models import Attribute, Entity, Value
+from eav.models import Attribute, Entity
 
 
 class EavConfig:
@@ -179,7 +180,7 @@ class Registry:
 
         gr_name = self.config_cls.generic_relation_attr.lower()
         generic_relation = generic.GenericRelation(
-            Value,
+            get_value_model_name(),
             object_id_field=get_entity_pk_type(self.model_cls),
             content_type_field="entity_ct",
             related_query_name=rel_name,
